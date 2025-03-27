@@ -13,7 +13,7 @@ struct No {
     struct No *esq;
     struct No *dir;
 };
-
+// LIBERAR MEMORIA ALOCADA
 void liberarMemoriaArvore(struct No *raiz) {
     if (raiz != NULL) {
         liberarMemoriaArvore(raiz->esq);
@@ -21,11 +21,12 @@ void liberarMemoriaArvore(struct No *raiz) {
         free(raiz);
     }
 }
-
+// FUNCAO PARA INSERCAO DE PAGAMENTO NA ARVORE
 void inserirFatura(struct No **raiz, struct Pagamento novoPagamento){
-
+    // Aloca a memoria dinamicamente para a arvore binaria
     if (*raiz == NULL) {
         *raiz = (struct No *)malloc(sizeof(struct No));
+        // Armazena os dados de pagamento atravez do registro novoPagamento para o novo NOh 
         if (*raiz != NULL) {
             (*raiz)->pagamento = novoPagamento;
             (*raiz)->esq = NULL;
@@ -34,6 +35,7 @@ void inserirFatura(struct No **raiz, struct Pagamento novoPagamento){
             printf("ERROR : Insercao invalida!\n");
         }
     } else {
+        // recursao para ler o no da esquerda primeiro e depois direita ate encontrar o null e poder armazenar os dados no NOh
         if (novoPagamento.id < (*raiz)->pagamento.id) {
             inserirFatura(&(*raiz)->esq, novoPagamento);
         } else if (novoPagamento.id > (*raiz)->pagamento.id) {
@@ -44,7 +46,7 @@ void inserirFatura(struct No **raiz, struct Pagamento novoPagamento){
     }
 
 }
-
+// FUNCAO PARA BUSCA DE FATURA
 struct No *buscarFatura(struct No *raiz, int buscarId) {
     if (raiz == NULL || raiz->pagamento.id == buscarId) {
         return raiz;
@@ -54,12 +56,12 @@ struct No *buscarFatura(struct No *raiz, int buscarId) {
     }
     return buscarFatura(raiz->dir, buscarId);
 }
-
+// FUNCAO PARA ALTERAR O STATUS DO PAGAMENTO
 void alterarFatura(struct No **raiz, int faturaId){
 
     int novaQuant = 0;
     char novoStatus[9] = "pago";
-
+    // ENTRA NA FUNCAO BUSCARFATURA PARA ENCONTRAR A RAIZ CORRETA QUE ESTA O PAGAMENTO QUE DESEJE ALTERAR A FATURA
     struct No *encontrado = buscarFatura(*raiz, faturaId);
     if(encontrado != NULL){
 
@@ -77,7 +79,7 @@ void alterarFatura(struct No **raiz, int faturaId){
     }
 
 }
-
+// EXIBIR TODAS AS FATURAS, utiliza o sistema inOrder para listar de forma crescente
 void exibirFaturas(struct No *raiz){
     if(raiz != NULL){
         exibirFaturas(raiz->esq);
@@ -89,17 +91,19 @@ void exibirFaturas(struct No *raiz){
         exibirFaturas(raiz->dir);
     }
 }
-
+// FUNCAO PARA REMOVER A FATURA
 int removerFatura(struct No **raiz, int removerId) {
     if (*raiz == NULL) {
         printf("Nao ha noh [%i] na arvore!\n", removerId);
         return -1;
     }
+    // PRIMEIRO VAI ATRAS DO NOH QUE APRESENTA O PAGAMENTO ATRAVEZ DE RECURSAO.
     if (removerId < (*raiz)->pagamento.id) {
         return removerFatura(&((*raiz)->esq), removerId);
     } else if (removerId > (*raiz)->pagamento.id) {
         return removerFatura(&((*raiz)->dir), removerId);
     } else {
+        // CRIA UM TEMPORARIO PARA ARMAZENAR A RAIZ CORRETA
         struct No *temp = *raiz;
         if (temp->esq == NULL) {
             *raiz = temp->dir;
@@ -108,12 +112,15 @@ int removerFatura(struct No **raiz, int removerId) {
             *raiz = temp->esq;
             free(temp);
         } else {
+            // Faz a troca utilizando nos temporarios para subir o ramo da arvore
             struct No *aux = temp->dir;
             struct No *paiAux = temp;
+            // While para ler os ramos a esquerda ate encontrar NULL e sair
             while (aux->esq != NULL) {
                 paiAux = aux;
                 aux = aux->esq;
             }
+            // faz a troca das variaveis do no pagamento
             temp->pagamento = aux->pagamento;
             if (paiAux->esq == aux) {
                 paiAux->esq = aux->dir;
@@ -161,7 +168,7 @@ int main(void){
                 scanf("%f", &pagamento.valor);
                 getchar();
 
-                strcpy(pagamento.status, pendente);
+                strcpy(pagamento.status, pendente); //
 
                 inserirFatura(&raiz, pagamento);
                 break;
